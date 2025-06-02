@@ -19,6 +19,7 @@ output "dev_proj_1_ec2_instance_id" {
 resource "aws_instance" "dev_proj_1_ec2" {
   ami           = var.ami_id
   instance_type = var.instance_type
+  key_name = aws_key_pair.dev_proj_key.key_name
   tags = {
     Name = var.tag_name
   }
@@ -46,8 +47,8 @@ resource "aws_key_pair" "dev_proj_key" {
   public_key = file("~/.ssh/id_rsa.pub") # Or path to your downloaded .pub file
 }
 
-# Then reference it in your EC2 instance:
-resource "aws_instance" "dev_proj_1_ec2" {
-  key_name = aws_key_pair.dev_proj_key.key_name
-  # ... rest of config ...
-}
+# # Then reference it in your EC2 instance:
+# resource "aws_instance" "dev_proj_1_ec2" {
+#   key_name = aws_key_pair.dev_proj_key.key_name
+#   # ... rest of config ...
+# }

@@ -36,10 +36,10 @@ resource "aws_instance" "dev_proj_1_ec2" {
   }
 }
 
-resource "aws_key_pair" "dev_proj_1_public_key" {
-  key_name   = "mykeypair1"
-  public_key = var.public_key
-}
+# resource "aws_key_pair" "dev_proj_1_public_key" {
+#   key_name   = "mykeypair1"
+#   public_key = var.public_key
+# }
 
 # Option A: If you have the key pair file locally but need to create it in AWS
 resource "aws_key_pair" "dev_proj_key" {

@@ -39,3 +39,15 @@ resource "aws_key_pair" "dev_proj_1_public_key" {
   key_name   = "mykeypair1"
   public_key = var.public_key
 }
+
+# Option A: If you have the key pair file locally but need to create it in AWS
+resource "aws_key_pair" "dev_proj_key" {
+  key_name   = "mykeypair1"
+  public_key = file("~/.ssh/id_rsa.pub") # Or path to your downloaded .pub file
+}
+
+# Then reference it in your EC2 instance:
+resource "aws_instance" "dev_proj_1_ec2" {
+  key_name = aws_key_pair.dev_proj_key.key_name
+  # ... rest of config ...
+}

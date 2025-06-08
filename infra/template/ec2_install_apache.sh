@@ -1,7 +1,5 @@
 
 #!/bin/bash
-set -e
-
 cd /home/ubuntu
 
 # Install required packages

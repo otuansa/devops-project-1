@@ -33,6 +33,7 @@ module "ec2" {
   ec2_sg_name_for_python_api     = module.security_group.sg_ec2_for_python_api
   enable_public_ip_address = true
   user_data_install_apache = templatefile("./template/ec2_install_apache.sh", {})
+  user_data = user_data_install_apache
 }
 
 module "lb_target_group" {

@@ -27,7 +27,7 @@ resource "aws_instance" "dev_proj_1_ec2" {
   vpc_security_group_ids      = [var.sg_enable_ssh_https, var.ec2_sg_name_for_python_api]
   associate_public_ip_address = var.enable_public_ip_address
 
-  user_data = var.user_data_install_apache
+  user_data = var.ec2_user_data_install_apache
 
   metadata_options {
     http_endpoint = "enabled"  # Enable the IMDSv2 endpoint

@@ -4,7 +4,7 @@ cd /home/ubuntu
 
 # Install required packages
 yes | sudo apt update
-yes | sudo apt install -y python3 python3-pip python3.12-venv git
+yes | sudo apt install python3 python3-pip
 
 # Clone the repo
 git clone https://github.com/otuansa/python-mysql-db-proj-1.git

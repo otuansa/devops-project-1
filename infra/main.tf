@@ -27,7 +27,7 @@ locals {
 }
 
 module "ec2" {
-  source                   = "./modules/ec2"
+  source                   = "./ec2"
   ami_id                   = var.ec2_ami_id
   instance_type            = "t2.micro"
   tag_name                 = "Ubuntu Linux EC2"

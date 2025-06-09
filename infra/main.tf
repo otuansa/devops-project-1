@@ -22,8 +22,12 @@ module "security_group" {
   ec2_sg_name_for_python_api = "SG for EC2 for enabling port 5000"
 }
 
+locals {
+  ec2_user_data_install_apache = templatefile("./template/ec2_install_apache.sh", {})
+}
+
 module "ec2" {
-  source                   = "./ec2"
+  source                   = "./modules/ec2"
   ami_id                   = var.ec2_ami_id
   instance_type            = "t2.micro"
   tag_name                 = "Ubuntu Linux EC2"
@@ -33,6 +37,8 @@ module "ec2" {
   ec2_sg_name_for_python_api     = module.security_group.sg_ec2_for_python_api
   enable_public_ip_address = true
   user_data_install_apache = templatefile("./template/ec2_install_apache.sh", {})
+  ec2_user_data_install_apache = local.ec2_user_data_install_apache
+
 }
 
 module "lb_target_group" {

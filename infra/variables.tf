@@ -57,3 +57,8 @@ variable "domain_name" {
   type = string
   description = "Name of the domain"
 }
+
+variable "user_data" {
+  type    = string
+  default = "User Data "
+}

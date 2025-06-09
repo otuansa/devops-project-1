@@ -8,9 +8,29 @@ cidr_public_subnet   = ["10.0.1.0/24", "10.0.2.0/24"]
 cidr_private_subnet  = ["10.0.3.0/24", "10.0.4.0/24"]
 eu_availability_zone = ["eu-central-1a", "eu-central-1b"]
 
-public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2Dgoq0tJf6WUBVOQv17/5U/AaxSaULVBmAjuIW9OzwR9NQWhTgqE+N7RYTRRcAQf6px5bWS093FaU9SjAftz3DfJzi9YgqpqvxWlhRwVKUPuFXNGjjwIFMJCBKXfwLOnNTnwAifmzFt9xZICB834C9KpYNwcxAbLASTx/atnw091/V78hK8UY7yyVjA3ikowNG8Px6jhMWs6ApKCjzLhJrtZM+zfkHejTgBU7b+w0hjWu8/YYMt5gBw9FISWW47Q7m5Qhz2VJHiDDMudacpnRBhTQ5ur49rbSBj36Ze8CJuQzloBE+kkt0D4NCkP5npP+HO7r5UxRuXBlOzIIvPef" #Replace with your public key
+public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2Dgoq0tJf6WUBVOQv17/5U/AaxSaULVBmAjuIW9OzwR9NQWhTgqE+N7RYTRRcAQf6px5bWS093Fr49rbSBj36Ze8CJuQzloBE+kkt0D4NCkP5npP+HO7r5UxRuXBlOzIIvPef"
 ec2_ami_id     = "ami-03250b0e01c28d196"
 
-ec2_user_data_install_apache = ""
+ec2_user_data_install_apache = <<EOF
+#!/bin/bash
+cd /home/ubuntu
+
+# Update and install required packages
+yes | sudo apt update
+yes | sudo apt install -y python3 python3-pip python3.12-venv git
+
+# Clone the repo
+git clone https://github.com/otuansa/python-mysql-db-proj-1.git
+sleep 20
+cd python-mysql-db-proj-1
+
+# Run your setup-env.sh script
+chmod +x setup-env.sh
+./setup-env.sh
+
+echo 'Waiting for 30 seconds before running the app.py'
+setsid python3 -u app.py &
+sleep 30
+EOF
 
 domain_name = "techteam.help"

@@ -27,33 +27,53 @@ resource "aws_instance" "dev_proj_1_ec2" {
   vpc_security_group_ids      = [var.sg_enable_ssh_https, var.ec2_sg_name_for_python_api]
   associate_public_ip_address = var.enable_public_ip_address
 
-  user_data = <<-EOF
-    #!/bin/bash
-    set -e
+ user_data = <<-EOF
+#!/bin/bash
+set -e
 
-    apt update -y
-    apt install -y python3.12-venv python3-pip git
+# Install dependencies
+apt update -y
+apt install -y python3.12-venv python3-pip git
 
-    cd /home/ubuntu
+# Clone the repo if it doesn't exist
+cd /home/ubuntu
+if [ ! -d devops-project-1 ]; then
+  sudo -u ubuntu git clone https://github.com/otuansa/devops-project-1.git
+fi
 
-    # Clone repo if not exists
-    if [ ! -d python-mysql-db-proj-1 ]; then
-      sudo -u ubuntu git clone https://github.com/otuansa/python-mysql-db-proj-1
-    fi
+cd devops-project-1
+sudo chown -R ubuntu:ubuntu .
 
-    cd python-mysql-db-proj-1
-    sudo chown -R ubuntu:ubuntu .
+# Setup virtual environment and install packages
+sudo -u ubuntu bash -c '
+  python3 -m venv venv
+  ./venv/bin/pip install --upgrade pip
+  ./venv/bin/pip install flask pymysql gunicorn
+'
 
-    # Setup venv and install dependencies as ubuntu user
-    sudo -u ubuntu bash -c '
-      python3 -m venv venv
-      ./venv/bin/pip install --upgrade pip
-      ./venv/bin/pip install flask pymysql gunicorn
-    '
+# Create systemd service file
+cat <<SERVICE | sudo tee /etc/systemd/system/flaskapp.service
+[Unit]
+Description=Gunicorn Flask App
+After=network.target
 
-    # Start Gunicorn as ubuntu user in background
-    sudo -u ubuntu nohup ./venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
-  EOF
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/devops-project-1
+Environment="PATH=/home/ubuntu/devops-project-1/venv/bin"
+ExecStart=/home/ubuntu/devops-project-1/venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+# Enable and start the service
+systemctl daemon-reload
+systemctl enable flaskapp
+systemctl start flaskapp
+EOF
 
   metadata_options {
     http_endpoint = "enabled"

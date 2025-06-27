@@ -60,9 +60,9 @@ After=network.target
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/devops-project-1
-Environment="PATH=/home/ubuntu/devops-project-1/venv/bin"
-ExecStart=/home/ubuntu/devops-project-1/venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app
+WorkingDirectory=/home/ubuntu/python-mysql-db-proj-1
+Environment="PATH=/home/ubuntu/python-mysql-db-proj-1/venv/bin"
+ExecStart=/home/ubuntu/python-mysql-db-proj-1/venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app
 Restart=always
 
 [Install]

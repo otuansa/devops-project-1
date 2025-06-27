@@ -60,5 +60,5 @@ variable "domain_name" {
 
 variable "user_data" {
   type    = string
-  default = "User Data "
+  default = "User Data"
 }

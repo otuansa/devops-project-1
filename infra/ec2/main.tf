@@ -16,8 +16,7 @@ output "dev_proj_1_ec2_instance_id" {
   value = aws_instance.dev_proj_1_ec2.id
 }
 
-resource "aws_instance" "dev_proj_1_ec2" {
-  ami           = var.ami_id
+/      = var.ami_id
   instance_type = var.instance_type
   tags = {
     Name = var.tag_name
@@ -27,7 +26,37 @@ resource "aws_instance" "dev_proj_1_ec2" {
   vpc_security_group_ids      = [var.sg_enable_ssh_https, var.ec2_sg_name_for_python_api]
   associate_public_ip_address = var.enable_public_ip_address
 
-  user_data = var.user_data_install_flaskapp
+  user_data = <<-EOF
+    #!/bin/bash
+    set -e
+
+    # Install dependencies
+    apt update -y
+    apt install -y python3.12-venv python3-pip git
+
+    # Move to home directory
+    cd /home/ubuntu
+
+    # Clone the GitHub repo
+    git clone https://github.com/otuansa/python-mysql-db-proj-1
+    cd python-mysql-db-proj-1
+
+    # Set ownership
+    chown -R ubuntu:ubuntu .
+
+    # Create virtual environment
+    python3 -m venv venv
+    source venv/bin/activate
+
+    # Install required packages
+    pip install --upgrade pip
+    pip install flask pymysql gunicorn
+
+    # Start Gunicorn in the background
+    nohup ./venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
+  EOF
+}
+
 
   metadata_options {
     http_endpoint = "enabled"  # Enable the IMDSv2 endpoint

@@ -1,58 +1,46 @@
 #!/bin/bash
-
-# Fail on error
 set -e
 
-# Variables
-APP_DIR="/home/ubuntu/python-mysql-db-proj-1"
-VENV_DIR="$APP_DIR/venv"
-LOG_FILE="$APP_DIR/gunicorn.log"
-GUNICORN_CMD="$VENV_DIR/bin/gunicorn"
-APP_MODULE="app:app"
+# Install dependencies
+apt update -y
+apt install -y python3.12-venv python3-pip git
 
-# Update system and install Python venv
-sudo apt update
-sudo apt install -y python3.12-venv python3-pip
+# Clone the repo if it doesn't exist
+cd /home/ubuntu
+if [ ! -d devops-project-1 ]; then
+  sudo -u ubuntu git clone https://github.com/otuansa/python-mysql-db-proj-1
+fi
 
-# Navigate to app directory
-cd "$APP_DIR"
-
-# Ensure correct permissions
+cd python-mysql-db-proj-1
 sudo chown -R ubuntu:ubuntu .
 
-# Set up virtual environment
-python3 -m venv venv
-source "$VENV_DIR/bin/activate"
+# Setup virtual environment and install packages
+sudo -u ubuntu bash -c '
+  python3 -m venv venv
+  ./venv/bin/pip install --upgrade pip
+  ./venv/bin/pip install flask pymysql gunicorn
+'
 
-# Install Python packages
-pip install --upgrade pip
-pip install flask pymysql gunicorn
+# Create systemd service file
+cat <<SERVICE | sudo tee /etc/systemd/system/flaskapp.service
+[Unit]
+Description=Gunicorn Flask App
+After=network.target
 
-# Stop any existing Gunicorn process (optional cleanup)
-pkill gunicorn || true
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/devops-project-1
+Environment="PATH=/home/ubuntu/devops-project-1/venv/bin"
+ExecStart=/home/ubuntu/devops-project-1/venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app
+Restart=always
 
-# Start the Flask app with Gunicorn in background and log output
-nohup "$GUNICORN_CMD" -w 4 -b 0.0.0.0:5000 "$APP_MODULE" > "$LOG_FILE" 2>&1 &
+[Install]
+WantedBy=multi-user.target
+SERVICE
 
-echo "Flask app started via Gunicorn and is listening on port 5000"
-
-
-
-
-
-
-
-
-# #! /bin/bash
-# # shellcheck disable=SC2164
-# cd /home/ubuntu
-# yes | sudo apt update
-# yes | sudo apt install python3 python3-pip
-# git clone https://github.com/otuansa/python-mysql-db-proj-1.git
-# sleep 20
-# # shellcheck disable=SC2164
-# cd python-mysql-db-proj-1
-# pip3 install -r requirements.txt
-# echo 'Waiting for 30 seconds before running the app.py'
-# setsid python3 -u app.py &
-# sleep 30
+# Enable and start the service
+systemctl daemon-reload
+systemctl enable flaskapp
+systemctl start flaskapp
+EOF

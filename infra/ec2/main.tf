@@ -38,10 +38,10 @@ apt install -y python3.12-venv python3-pip git
 # Clone the repo if it doesn't exist
 cd /home/ubuntu
 if [ ! -d devops-project-1 ]; then
-  sudo -u ubuntu git clone https://github.com/otuansa/devops-project-1.git
+  sudo -u ubuntu git clone https://github.com/otuansa/python-mysql-db-proj-1
 fi
 
-cd devops-project-1
+cd python-mysql-db-proj-1
 sudo chown -R ubuntu:ubuntu .
 
 # Setup virtual environment and install packages

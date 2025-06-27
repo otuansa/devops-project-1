@@ -16,7 +16,8 @@ output "dev_proj_1_ec2_instance_id" {
   value = aws_instance.dev_proj_1_ec2.id
 }
 
-/      = var.ami_id
+resource "aws_instance" "dev_proj_1_ec2" {
+  ami           = var.ami_id
   instance_type = var.instance_type
   tags = {
     Name = var.tag_name

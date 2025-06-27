@@ -11,7 +11,7 @@ eu_availability_zone = ["eu-central-1a", "eu-central-1b"]
 public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2Dgoq0tJf6WUBVOQv17/5U/AaxSaULVBmAjuIW9OzwR9NQWhTgqE+N7RYTRRcAQf6px5bWS093Fr49rbSBj36Ze8CJuQzloBE+kkt0D4NCkP5npP+HO7r5UxRuXBlOzIIvPef"
 ec2_ami_id     = "ami-03250b0e01c28d196"
 
- user_data = <<-EOF
+ ec2_user_data_install_flaskapp = <<-EOF
 #!/bin/bash
 
 # Install dependencies

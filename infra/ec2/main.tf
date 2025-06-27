@@ -29,7 +29,6 @@ resource "aws_instance" "dev_proj_1_ec2" {
 
  user_data = <<-EOF
 #!/bin/bash
-set -e
 
 # Install dependencies
 apt update -y

@@ -31,37 +31,33 @@ resource "aws_instance" "dev_proj_1_ec2" {
     #!/bin/bash
     set -e
 
-    # Install dependencies
     apt update -y
     apt install -y python3.12-venv python3-pip git
 
-    # Move to home directory
     cd /home/ubuntu
 
-    # Clone the GitHub repo
-    git clone https://github.com/otuansa/python-mysql-db-proj-1
+    # Clone repo if not exists
+    if [ ! -d python-mysql-db-proj-1 ]; then
+      sudo -u ubuntu git clone https://github.com/otuansa/python-mysql-db-proj-1
+    fi
+
     cd python-mysql-db-proj-1
+    sudo chown -R ubuntu:ubuntu .
 
-    # Set ownership
-    chown -R ubuntu:ubuntu .
+    # Setup venv and install dependencies as ubuntu user
+    sudo -u ubuntu bash -c '
+      python3 -m venv venv
+      ./venv/bin/pip install --upgrade pip
+      ./venv/bin/pip install flask pymysql gunicorn
+    '
 
-    # Create virtual environment
-    python3 -m venv venv
-    source venv/bin/activate
-
-    # Install required packages
-    pip install --upgrade pip
-    pip install flask pymysql gunicorn
-
-    # Start Gunicorn in the background
-    nohup ./venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
+    # Start Gunicorn as ubuntu user in background
+    sudo -u ubuntu nohup ./venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
   EOF
-}
-
 
   metadata_options {
-    http_endpoint = "enabled"  # Enable the IMDSv2 endpoint
-    http_tokens   = "required" # Require the use of IMDSv2 tokens
+    http_endpoint = "enabled"
+    http_tokens   = "required"
   }
 }
 
